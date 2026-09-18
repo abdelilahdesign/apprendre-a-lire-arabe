@@ -1,3 +1,4 @@
+<!--VERSION:6-->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -272,6 +273,24 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button,.btn,.lcard,.opt,.tile,.flip-in{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 html.standalone body{overscroll-behavior-y:none}
 
+/* Banneau de mise à jour disponible */
+.update-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--badbg);color:#8a1a12;border-radius:var(--r);padding:10px 14px;margin-top:12px;font-size:15px}
+.update-banner .link{color:#8a1a12;font-weight:500;white-space:nowrap}
+
+/* Onglet Lecture */
+.lectures{display:flex;flex-direction:column;gap:12px;padding:0 0 20px}
+.lec-card{background:var(--card);border-radius:var(--r);padding:18px 16px 16px;box-shadow:var(--shadow)}
+.lec-head{display:flex;align-items:baseline;gap:10px}
+.lec-num{font-family:var(--f-display);font-size:40px;line-height:1;color:var(--ink)}
+.lec-lbl{font-family:var(--f-lbl);font-size:15px;color:var(--ink2)}
+.lec-list{list-style:none;margin:12px 0 16px;padding:0;direction:rtl;border-top:1px solid rgba(74,52,38,.15)}
+.lec-list li{display:flex;align-items:center;gap:14px;padding:8px 2px;border-bottom:1px solid rgba(74,52,38,.1)}
+.lec-list .n{font-family:var(--f-sans);font-size:14px;color:var(--ink2);min-width:22px;direction:ltr}
+.lec-list .w{font-size:32px;color:var(--ink)}
+.lec-w{display:flex;flex-direction:column;align-items:flex-start;gap:0;min-width:0}
+.lec-fr{margin:0;direction:ltr;align-self:stretch;text-align:right;font-family:var(--f-lbl);font-size:15px;color:var(--ink2);font-style:italic;line-height:1.3}
+.lec-card .btn{min-height:48px;font-size:15px;text-decoration:none;text-align:center}
+
 </style>
 </head>
 <body>
@@ -279,6 +298,7 @@ html.standalone body{overscroll-behavior-y:none}
 <nav id="nav" class="nav" aria-label="Navigation">
   <button data-act="tab" data-tab="home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="8" height="11" rx="2"/><rect x="13" y="9" width="8" height="11" rx="2"/></svg>Séances</button>
   <button data-act="tab" data-tab="dictees"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>Dictées</button>
+  <button data-act="tab" data-tab="lecture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v13H6.5A2.5 2.5 0 0 0 4 17.5v-13Z"/></svg>Lecture</button>
 </nav>
 <script id="app-data" type="application/json">null</script>
 <script id="app-audio" type="application/json">{}</script>
@@ -330,14 +350,14 @@ const LONG = { [F]: 'ا', [K]: 'ي', [D]: 'و' };
 const LT = (ch, slug, name, hint, s, tr) => ({ ch, slug, name, hint, s, tr });
 const LETTERS = [
   LT('ب', 'ba', 'ba', 'équivalent du son B', 1, 'b'),
-  LT('ا', 'alif', 'alif', 'prolongations', 2, 'a'),
+  LT('ا', 'alif', 'alif', 'prolongation', 2, 'a'),
   LT('و', 'waw', 'waw', 'équivalent du son W', 2, 'w'),
-  LT('ي', 'ya', 'ya', 'équivalent du son Y (anglais)', 2, 'y'),
+  LT('ي', 'ya', 'ya', '', 2, 'y'),
   LT('س', 'sin', 'sin', 'équivalent du son S', 2, 's'),
   LT('ذ', 'dhel', 'dhel', 'équivalent du son TH anglais (the)', 3, 'dh'),
   LT('ن', 'noun', 'noun', 'équivalent du son N', 3, 'n'),
-  LT('ع', '3ain', '3ain', 'son « 3 » (sans équivalent)', 3, '3'),
-  LT('ج', 'djim', 'djim', 'équivalent du son DJ', 4, 'dj'),
+  LT('ع', '3ain', '3ain', '', 3, '3'),
+  LT('ج', 'djim', 'djim', 'équivalent du son Dj', 4, 'dj'),
   LT('ط', 'taa', 'Taa', 'équivalent du son T emphatique', 4, 'T'),
   LT('ء', 'hamza', 'hamza', 'on ne prononce que la haraka', 4, "'"),
   LT('ك', 'kaf', 'kaf', 'équivalent du son K', 4, 'k'),
@@ -346,15 +366,15 @@ const LETTERS = [
   LT('ق', 'qaf', 'qaf', 'équivalent du son Q emphatique', 5, 'q'),
   LT('ر', 'rra', 'rra', 'équivalent du son R roulé espagnol', 6, 'r'),
   LT('م', 'mim', 'mim', 'équivalent du son M', 6, 'm'),
-  LT('غ', 'ghain', 'ghain', 'équivalent du son R un peu enroué', 6, 'gh'),
+  LT('غ', 'ghain', 'ghain', 'R enroué', 6, 'gh'),
   LT('ح', 'hha', 'hha', 'équivalent du son H de Hassan', 6, 'hh'),
-  LT('ث', 'thai', 'thai', 'équivalent du son T, langue entre les dents', 7, 'th'),
+  LT('ث', 'thai', 'thai', 'T, langue entre les dents', 7, 'th'),
   LT('ض', 'dad', 'Dad', 'équivalent du son D emphatique', 7, 'D'),
   LT('د', 'del', 'del', 'équivalent du son D', 8, 'd'),
   LT('ش', 'chin', 'chin', 'équivalent du son CH', 8, 'ch'),
   LT('ف', 'fa', 'fa', 'équivalent du son F', 8, 'f'),
   LT('ز', 'zay', 'zay', 'équivalent du son Z', 8, 'z'),
-  LT('ت', 'tai', 'tai', 'équivalent du son T', 8, 't'),
+  LT('ت', 'tai', 'tai', 'T (emphatique)', 8, 't'),
   LT('ة', 'tamarbouta', 'ta marbouta', 'féminin, « ha » en fin de phrase', 8, 't'),
   LT('ظ', 'dhaa', 'DHaa', 'équivalent du son ذ emphatique', 8, 'DH'),
   LT('ه', 'ha', 'ha', 'équivalent d\'un petit souffle (h)', 8, 'h'),
@@ -549,6 +569,38 @@ const WORDS_DEFAULT = [
   [2, 'سُوسٌ', 'souusoun', 'reel', 'charançon (insecte) ; réglisse', true], [2, 'وَسِيبَا', 'wèsiibaa', 'invente', '']
 ];
 
+
+/* Listes de lecture : une liste = une image envoyée en classe.
+   Chaque mot : [arabe vocalisé, traduction, 'syl' si lecture syllabique (sans sens)].
+   « · » = traduction mot à mot. */
+const LECTURES = [
+  { num: 1, mots: [
+    ['بَابٌ', 'porte'], ['بَابَا', 'papa'], ['سُوسٌ', 'charançon (insecte)'], ['سِيبَا', 'laisse / laisser'],
+    ['يَابَا', 'ô père / papa (pour appeler)'], ['بُوَابٌ', 'portier'], ['سَوَاسٌ', 'égalité'], ['يَابِسٌ', 'sec'], ['بَاسُو', 'nom propre'] ] },
+  { num: 2, mots: [
+    ['سَبَبٌ', 'cause'], ['بَنَانٌ', 'bout des doigts'], ['عَذَابٌ', 'souffrance / châtiment'], ['ذِبَابٌ', 'mouche'],
+    ['ذُنُوبٌ', 'péchés'], ['سُوَانٍ', 'égal / pareil'], ['عِنَانٌ', 'limite / frein'], ['نَعَبٌ', 'croassement'],
+    ['يَنْعَبُ', 'il croasse'], ['نُعَاسٌ', 'somnolence'] ] },
+  { num: 3, mots: [
+    ['كَذَالِكَ', 'ainsi, de même'], ['عَذَابٌ', 'souffrance / châtiment'], ['طَبَّعَ', 'il a habitué, normalisé'],
+    ['بَلُوطَ', 'chêne, gland'], ['سَحَاءُنَ', '', 'syl'] ] },
+  { num: 4, mots: [
+    ['بَبُ السَّبَبَ', '', 'syl'], ['الْوَدِي الْخَذَانَ', '', 'syl'], ['ذَجُّنَ الْبَيْسُ', '', 'syl'], ['عِنَاءُ النَّعَيجُ', '', 'syl'] ] },
+  { num: 5, mots: [
+    ['كَلْبٌ ٱلْقَلْبُ', 'chien · le cœur'], ['كَلْبٌ ٱلْعِلْمُ', 'chien · la science'], ['عِلْمٌ ٱلذِّكْرُ', 'science · le rappel (dhikr)'],
+    ['ذِكْرٌ ٱلْخَلْقُ', 'rappel · la création'], ['خَلْقٌ ٱلرَّسْمُ', 'création · le dessin'], ['رَسْمٌ ٱلسُّلَّمُ', 'dessin · l\'échelle'],
+    ['سُلَّمٌ ٱلنَّسْقُ', 'échelle · l\'ordre, l\'arrangement'] ] },
+  { num: 6, mots: [
+    ['بَعْدَ ٱلسَّدِّ', 'après le barrage'], ['عِنْدَ ٱلسَّدِّ', 'auprès du barrage'], ['بَعْدَ ٱلْخُلْدِ', 'après l\'éternité'],
+    ['ٱلْخُلْدُ نَدٌّ', 'l\'éternité est un égal'] ] },
+  { num: 7, mots: [
+    ['شَذَّ ٱلسَّبَبُ', 'la cause s\'est écartée (est inhabituelle)'], ['ٱلشَّأْنُ بَعْدَ', 'l\'affaire · après'], ['ٱلشَّمْسُ قَمَرٌ', 'le soleil · lune'],
+    ['رٌّ غَاشٍ', '', 'syl'], ['الرَّاشِدُ', 'le bien-guidé, le sage'] ] },
+  { num: 8, mots: [
+    ['ٱلْفَقْرُ كُفْرٌ', 'la pauvreté est une mécréance'], ['نَفْسٌ ٱلْفَقْرُ', 'âme · la pauvreté'], ['فَخْذٌ ٱلشَّمْسُ', 'cuisse · le soleil'],
+    ['ٱلْفِعْلُ شَرٌّ', 'l\'acte est un mal'], ['ٱلْفَرْقُ شَرٌّ', 'la différence est un mal'] ] },
+];
+
 function formsFor(card) {
   const P = `S${card.s}_${card.slug}`, out = [];
   const add = (ar, forme, ph) => out.push({ ar, forme, audio: forme === 'nom' ? P : `${P}_${forme}`, ph: ph || translit(ar) });
@@ -581,7 +633,7 @@ function defaultContent() {
     cnt[s] = (cnt[s] || 0) + 1;
     items.push({ id: uid(), type: 'mot', seance: s, ordre: cnt[s], arabe: ar, phonetique: ph, source: src, audio: `S${s}_mot${pad(cnt[s])}`, sens: sens || '', verif: !!verif });
   });
-  return { version: 2, updatedAt: 0, settings: { phone: '', code: '2026' }, dicteeSettings: {}, items };
+  return { version: 4, updatedAt: 0, settings: { phone: '', code: '2026' }, dicteeSettings: {}, items };
 }
 
 /* =====================================================================
@@ -892,6 +944,7 @@ function show(v) {
   $$('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === v));
   if (v === 'home') renderHome();
   else if (v === 'dictees') renderDictees();
+  else if (v === 'lecture') renderLecture();
   else if (v === 'admin') renderAdmin();
   window.scrollTo(0, 0);
 }
@@ -912,6 +965,7 @@ function renderHome() {
     <div class="prog"><div class="bar"><span style="width:${Math.round(done / all.length * 100)}%"></span></div><p>${done} carte${done > 1 ? 's' : ''} travaillée${done > 1 ? 's' : ''} sur ${all.length}</p></div>
     <button class="btn ghost block" data-act="send-prog">Envoyer ma progression au prof</button>
     ${installHTML()}
+    ${updateAvailable ? '<div class="update-banner"><span>Mise à jour disponible</span><button class="link" data-act="do-update">Installer</button></div>' : ''}
   </header>`;
   for (let s = 1; s <= 8; s++) {
     const cards = sessionCards(s), d = cards.filter(c => cardDone(c.slug)).length;
@@ -1184,8 +1238,8 @@ function progressMessage() {
   }
   return t;
 }
-/* Sur téléphone : on ouvre directement l'appli WhatsApp (whatsapp://), la page reste intacte
-   et on la retrouve telle quelle au retour. Sur ordinateur : wa.me dans un nouvel onglet. */
+/* Envoi WhatsApp : lien wa.me (seule méthode qui garde le message pré-rempli sur iPhone et Android).
+   La page de l'app reste ouverte derrière. */
 const isMobile = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 function sendWhatsApp(text) {
   const num = String(C.settings.phone || '').replace(/\D/g, '');
@@ -1198,7 +1252,7 @@ function sendWhatsApp(text) {
   document.addEventListener('visibilitychange', onHide);
   window.addEventListener('pagehide', onHide);
   const a = document.createElement('a');
-  a.href = 'whatsapp://send?' + (num ? 'phone=' + num + '&' : '') + 'text=' + t;
+  a.href = web; a.target = '_blank';
   a.rel = 'noopener'; a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => {
     document.removeEventListener('visibilitychange', onHide); window.removeEventListener('pagehide', onHide);
@@ -1207,6 +1261,36 @@ function sendWhatsApp(text) {
       <a class="btn primary block" href="${esc(web)}" target="_blank" rel="noopener">Ouvrir WhatsApp</a>
       <button class="btn ghost block" data-act="close-modal" style="margin-top:10px">Fermer</button>`);
   }, 2500);
+}
+
+/* =====================================================================
+   13 bis. LECTURE
+   ===================================================================== */
+function lectureMessage(lec) {
+  return `${ELEVE.prenom || 'Élève'} – Lecture ${lec.num} – ${today()}\n`
+    + lec.mots.map((m, i) => `${i + 1}- ${m[0]}`).join('\n');
+}
+function waURL(text) {
+  const num = String(C.settings.phone || '').replace(/\D/g, '');
+  return 'https://wa.me/' + num + '?text=' + encodeURIComponent(text);
+}
+function renderLecture() {
+  let h = `<header class="hero">
+    <p class="lbl">Mon cours d'arabe</p>
+    <h2 class="hero-title">Lecture</h2>
+    <p class="muted">Lis chaque liste à voix haute, puis envoie-la au prof avec ton audio sur WhatsApp.</p>
+  </header>`;
+  h += `<div class="lectures">`;
+  LECTURES.forEach(lec => {
+    h += `<section class="lec-card">
+      <div class="lec-head"><span class="lec-num">${pad(lec.num)}</span><span class="lec-lbl">Lecture</span></div>
+      <ol class="lec-list">${lec.mots.map((m, i) => `<li><span class="n">${i + 1}</span><div class="lec-w"><span class="w">${arHTML(m[0])}</span>
+        <p class="lec-fr">${m[2] === 'syl' ? '<span class="badge inv">lecture syllabique</span>' : esc(m[1])}</p></div></li>`).join('')}</ol>
+      <a class="btn primary block" href="${esc(waURL(lectureMessage(lec)))}" target="_blank" rel="noopener">Envoyer la lecture ${lec.num} au prof</a>
+    </section>`;
+  });
+  h += `</div>`;
+  main().innerHTML = h;
 }
 
 /* =====================================================================
@@ -1603,6 +1687,32 @@ function askName(first) {
 }
 
 /* =====================================================================
+   16.5. VÉRIFICATION DE VERSION (mise à jour)
+   ===================================================================== */
+let updateAvailable = false;
+async function checkForUpdates() {
+  if (!isHosted()) return;
+  try {
+    const resp = await fetch(location.origin + location.pathname + '?v=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) return;
+    const newHtml = await resp.text();
+    const oldMatch = document.documentElement.outerHTML.match(/<!--VERSION:([^-]*)/);
+    const newMatch = newHtml.match(/<!--VERSION:([^-]*)/);
+    const oldVer = oldMatch ? parseInt(oldMatch[1], 10) : 0;
+    const newVer = newMatch ? parseInt(newMatch[1], 10) : 0;
+    if (newVer > oldVer) {
+      updateAvailable = true;
+      if (VIEW === 'home') renderHome();
+      const html = '<h2>Mise à jour disponible</h2><hr class="rule"><p>Une nouvelle version de l\'application est prête. Touche ci-dessous pour la télécharger et redémarrer.</p><button class="btn primary block" data-act="do-update">Mettre à jour maintenant</button><button class="btn ghost block" data-act="close-modal">Plus tard</button>';
+      modal(html);
+    }
+  } catch (e) { /* offline or error: ne rien faire */ }
+}
+Object.assign(ACT, {
+  'do-update': () => { location.reload(true); }
+});
+
+/* =====================================================================
    16 bis. APPLICATION INSTALLABLE (PWA)
    Actif seulement quand la page est servie en https (hébergement avec
    manifest.webmanifest et sw.js à côté). Ouvert en fichier local, rien ne change.
@@ -1640,6 +1750,7 @@ Object.assign(ACT, {
 async function boot() {
   setupPWA();
   loadContent();
+  checkForUpdates();
   await IDB.open();
   const loc = await IDB.all(); Object.assign(AUDIO_LOC, loc);
   show('home');
