@@ -1,4 +1,4 @@
-<!--VERSION:12-->
+<!--VERSION:16-->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -638,6 +638,8 @@ html.standalone body{overscroll-behavior-y:none}
 .at-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:var(--card);border-radius:var(--r);padding:14px 14px 12px;min-height:128px;transition:transform .25s}
 .at-card:active{transform:scale(.97)}
 .at-card:last-child:nth-child(odd){grid-column:1/-1;min-height:0}
+.at-card.wide{grid-column:1/-1;min-height:0;flex-direction:row;align-items:center;flex-wrap:wrap;gap:4px 14px}
+.at-card.wide .at-d{flex-basis:100%}
 .at-card.off{opacity:.45}
 .at-g{font-size:28px;height:48px;display:flex;align-items:center;font-family:var(--f-ar)}
 .at-g .ar{font-size:36px;line-height:1.3}
@@ -646,6 +648,14 @@ html.standalone body{overscroll-behavior-y:none}
 .at-soon{position:absolute;top:10px;right:10px;font-size:10.5px;letter-spacing:.04em;padding:3px 7px;border-radius:999px;background:var(--paper);color:var(--ink2)}
 .rv.in .at-card{animation:atIn .6s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i) * 70ms + 150ms)}
 @keyframes atIn{from{opacity:0;transform:translateY(12px) scale(.97)}}
+.grp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.grp-card{background:var(--card);border-radius:var(--r);padding:12px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform .25s}
+.grp-card:active{transform:scale(.96)}
+.grp-card.off{opacity:.4}
+.grp-ar{font-size:20px;line-height:1.7;direction:rtl;white-space:nowrap}
+.grp-ar .ar{font-size:20px}
+.grp-d{font-size:11.5px;color:var(--ink2);text-align:center;line-height:1.25}
+.rv.in .grp-card{animation:atIn .5s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i) * 55ms + 260ms)}
 
 /* exercices */
 .ex-target{display:flex;justify-content:center;margin:4px 0 12px}
@@ -2635,20 +2645,38 @@ function tjCanvas() {
   TJ.raf = requestAnimationFrame(tick);
 }
 
-/* Son : voix synthétique pour les durées, petits effets */
+/* Son des prolongations (madd) et de la ghounna, distincts :
+   - prolongation (voyelle tenue) : timbre doux, façon voix chantée — deux sinusoïdes + une triangle légèrement désaccordée
+     pour un peu de rondeur, avec un vibrato discret, plutôt que le buzz électronique d'une simple dent de scie ;
+   - ghounna (nasalisation) : timbre filtré et nasillard, inchangé, propre à ce son-là. */
 function tjAudio() {
   try { const A = TJ.ac || (TJ.ac = new (window.AudioContext || window.webkitAudioContext)()); if (A.state === 'suspended') A.resume(); return A; } catch (e) { return null; }
 }
 function tjTone(beats, opt = {}) {
   const A = tjAudio(); if (!A) return;
   const t0 = A.currentTime + .05, d = beats * TJ_BEAT;
-  const o = A.createOscillator(), f = A.createBiquadFilter(), g = A.createGain();
-  o.type = 'sawtooth'; o.frequency.value = opt.freq || 196;
-  if (opt.nasal) { const lfo = A.createOscillator(), lg = A.createGain(); lfo.frequency.value = 5.5; lg.gain.value = 3; lfo.connect(lg).connect(o.frequency); lfo.start(t0); lfo.stop(t0 + d + .1); }
-  f.type = 'lowpass'; f.frequency.value = opt.nasal ? 520 : 900; f.Q.value = opt.nasal ? 8 : 2;
-  g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(.16, t0 + .06); g.gain.setValueAtTime(.16, t0 + d - .1); g.gain.linearRampToValueAtTime(0, t0 + d);
-  o.connect(f).connect(g).connect(A.destination); o.start(t0); o.stop(t0 + d + .05);
-  for (let i = 0; i < beats; i++) { const c = A.createOscillator(), cg = A.createGain(), ti = t0 + i * TJ_BEAT; c.frequency.value = i ? 1200 : 1600; cg.gain.setValueAtTime(.0001, ti); cg.gain.exponentialRampToValueAtTime(.12, ti + .005); cg.gain.exponentialRampToValueAtTime(.0001, ti + .07); c.connect(cg).connect(A.destination); c.start(ti); c.stop(ti + .09); }
+  const g = A.createGain(); g.connect(A.destination);
+  if (opt.nasal) {
+    const o = A.createOscillator(), f = A.createBiquadFilter();
+    o.type = 'sawtooth'; o.frequency.value = opt.freq || 196;
+    const lfo = A.createOscillator(), lg = A.createGain(); lfo.frequency.value = 5.5; lg.gain.value = 3; lfo.connect(lg).connect(o.frequency); lfo.start(t0); lfo.stop(t0 + d + .1);
+    f.type = 'lowpass'; f.frequency.value = 520; f.Q.value = 8;
+    g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(.16, t0 + .06); g.gain.setValueAtTime(.16, t0 + d - .1); g.gain.linearRampToValueAtTime(0, t0 + d);
+    o.connect(f).connect(g); o.start(t0); o.stop(t0 + d + .05);
+  } else {
+    const base = opt.freq || 196, f = A.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.value = 1500; f.Q.value = .6; f.connect(g);
+    const voice = (ratio, level, type, detune) => {
+      const o = A.createOscillator(), og = A.createGain(), lfo = A.createOscillator(), lg = A.createGain();
+      o.type = type; o.frequency.value = base * ratio * (detune || 1); og.gain.value = level;
+      lfo.frequency.value = 4.4; lg.gain.value = base * ratio * .007;
+      lfo.connect(lg).connect(o.frequency); lfo.start(t0); lfo.stop(t0 + d + .15);
+      o.connect(og).connect(f); o.start(t0); o.stop(t0 + d + .1);
+    };
+    voice(1, .5, 'sine'); voice(2, .16, 'sine'); voice(1, .22, 'triangle', 1.004);
+    g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(.2, t0 + .1); g.gain.setValueAtTime(.2, t0 + d - .12); g.gain.linearRampToValueAtTime(0, t0 + d);
+  }
+  for (let i = 0; i < beats; i++) { const c = A.createOscillator(), cg = A.createGain(), ti = t0 + i * TJ_BEAT; c.type = 'sine'; c.frequency.value = i ? 1100 : 1500; cg.gain.setValueAtTime(.0001, ti); cg.gain.exponentialRampToValueAtTime(.08, ti + .006); cg.gain.exponentialRampToValueAtTime(.0001, ti + .08); c.connect(cg).connect(A.destination); c.start(ti); c.stop(ti + .1); }
 }
 function tjPop(freq = 520, dur = .12, type = 'triangle') {
   const A = tjAudio(); if (!A) return;
@@ -3181,7 +3209,48 @@ function ateliersHTML() {
     <div class="lvl"><span>Jusqu'à la séance</span><div class="lvl-c">${[1, 2, 3, 4, 5, 6, 7, 8].map(s => `<button class="${s === L ? 'on' : ''}" data-act="level" data-s="${s}">${pad(s)}</button>`).join('')}</div></div>
     <div class="at-grid">${T.map(([k, n, d, g], i) => { const off = !exAvailable(k, L); return `<button class="at-card${off ? ' off' : ''}" style="--i:${i}" data-act="atelier" data-ex="${k}">
       <span class="at-g">${/[\u0600-\u06FF]/.test(g) ? A1(g) : g}</span><span class="at-n">${n}</span><span class="at-d">${off ? 'à partir de la séance 02' : d}</span>${k === 'ecoute' || k === 'ecris' ? '<span class="at-soon">audio bientôt</span>' : ''}</button>`; }).join('')}</div>
+    ${allerPlusLoinHTML()}
   </section>`;
+}
+/* --- Aller plus loin : lettres solaires/lunaires (leçon + exercices) et un atelier de discrimination par groupe de lettres qui se ressemblent.
+   Accessible à tous sans blocage, sur l'ensemble de l'alphabet (séance 8), indépendamment du niveau choisi pour les ateliers ci-dessus. --- */
+function openSolLunar() {
+  const card = CARDS.article, s = card.s;
+  const steps = [{ kind: 'notion', card }];
+  formsItems(card.slug).forEach(it => steps.push({ kind: 'flash', item: it, card }));
+  shuffle(wordsFor(card, s)).slice(0, 6).forEach(it => steps.push({ kind: 'flash', item: it, card }));
+  steps.push(...shuffle(cardQuiz(card, s)));
+  startSeries({ kind: 'serie', slug: 'article', s, title: 'Lettres solaires et lunaires', label: 'Aller plus loin', steps, trk: {}, rebuild: openSolLunar });
+}
+/* « Trouve la lettre », restreint aux seules lettres du groupe (sans compléter avec des lettres au hasard
+   comme le fait l'atelier général) : le but ici est justement de s'entraîner sur CES sosies précis. */
+function groupTrouve(mem) {
+  const t = pick(mem), pos = pick(['iso', 'init', 'med', 'fin']);
+  return { kind: 'ex', type: 'trouve', s: 8, title: EX_NAMES.trouve, target: t, pos, card: CARD_OF_CH[t],
+    options: shuffle(mem).map(l => ({ l, ar: formStr(l, pos) })) };
+}
+function openGroupDrill(gi) {
+  const g = GROUPS[gi], L = 8, mem = g.filter(x => (CHAR_S[x] || 99) <= L);
+  /* Rappel : on revoit chaque lettre du groupe (grande lettre, nom, formes) avant de s'exercer. */
+  const steps = mem.map(l => ({ kind: 'formes', card: CARDS[CARD_OF_CH[l]] }));
+  /* Puis un mélange de 4 types d'exercices — pas seulement de la reconnaissance — tous limités à ce groupe. */
+  const gens = [() => groupTrouve(mem), () => qMeme(L, pick(mem)), () => qDiscrim(pick(mem), L), () => qSyll(L, { letter: pick(mem), focus: 'lettre' })];
+  const quiz = []; let guard = 0;
+  while (quiz.length < 8 && guard++ < 100) { const q = gens[quiz.length % gens.length](); if (q && validStep(q, L)) quiz.push(q); }
+  steps.push(...shuffle(quiz));
+  startSeries({ kind: 'atelier', ex: 'proches', s: L, title: 'Lettres qui se ressemblent', label: `${g.join(' · ')} · alphabet complet`, steps, trk: {}, rebuild: () => openGroupDrill(gi) });
+}
+function allerPlusLoinHTML() {
+  return `<p class="lbl" style="margin-top:26px">Pour progresser</p><h3 class="sec-h">Aller plus loin</h3><hr class="sec-rule">
+    <div class="at-grid">
+      <button class="at-card wide" data-act="sollun">
+        <span class="at-g">${arHTML('ال')}</span><span class="at-n">Lettres solaires et lunaires</span>
+        <span class="at-d">Leçon et exercices sur l'article ال</span>
+      </button>
+    </div>
+    <p class="lbl" style="margin-top:20px">Lettres qui se ressemblent</p>
+    <div class="grp-grid">${GROUPS.map((g, i) => `<button class="grp-card" style="--i:${i}" data-act="grp" data-i="${i}">
+        <span class="grp-ar">${g.map(l => arHTML(l)).join(' ')}</span><span class="grp-d">${g.length} lettres à comparer</span></button>`).join('')}</div>`;
 }
 function animateProfile() {
   setTimeout(() => $$('.pf-bar span').forEach(s => s.style.width = s.dataset.w + '%'), 350);
@@ -3215,7 +3284,9 @@ Object.assign(ACT, {
   'draw-show': () => drawReveal(false),
   'draw-ok': () => drawValidate(),
   'draw-self': el => drawSelf(+el.dataset.v),
-  'api-play': async () => { const st = S && S.steps[S.i]; const u = st && await AudioAPI.url({ ar: st.target, s: st.s }); if (u) new Audio(u).play().catch(() => {}); }
+  'api-play': async () => { const st = S && S.steps[S.i]; const u = st && await AudioAPI.url({ ar: st.target, s: st.s }); if (u) new Audio(u).play().catch(() => {}); },
+  sollun: () => openSolLunar(),
+  grp: el => openGroupDrill(+el.dataset.i)
 });
 
 /* =====================================================================
