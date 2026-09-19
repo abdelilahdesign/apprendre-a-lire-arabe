@@ -1,4 +1,4 @@
-<!--VERSION:10-->
+<!--VERSION:12-->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -87,7 +87,7 @@ input,select,textarea{font:inherit;color:var(--ink)}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:12px}
 .lcard{position:relative;background:var(--card);border-radius:var(--r);padding:12px 6px 12px;min-height:134px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;box-shadow:var(--shadow);transition:transform .15s}
 .lcard:active{transform:scale(.97)}
-.lcard .ar{font-size:50px;line-height:1.55}
+.lcard .ar{font-size:50px;line-height:1.3}
 .lcard-name{font-family:var(--f-lbl);font-size:15px;margin-top:2px}
 .lcard-hint{font-size:11.5px;color:var(--ink2);line-height:1.25;margin-top:2px;padding:0 4px}
 .lcard.notion{background:transparent;border:1px solid var(--line);box-shadow:none}
@@ -129,9 +129,10 @@ input,select,textarea{font:inherit;color:var(--ink)}
 .prompt b{font-weight:600}
 .center{text-align:center}
 
-.onl{display:inline-block;border-bottom:3px solid var(--accent);padding:0 .35em;line-height:1.35}
-.big .ar{font-size:clamp(84px,30vw,128px);line-height:1.6}
-.word .ar{font-size:clamp(46px,15vw,72px);line-height:1.9}
+.onl{display:inline-block;position:relative;padding:0 .35em .12em;line-height:1.3}
+.onl::after{content:'';position:absolute;left:3%;right:3%;bottom:0;height:3px;border-radius:2px;background:var(--accent)}
+.big .ar{font-size:clamp(84px,30vw,128px);line-height:1.3}
+.word .ar{font-size:clamp(46px,15vw,72px);line-height:1.32}
 
 .flip{perspective:1200px;height:min(56vh,390px);margin:10px 0 14px}
 .flip-in{position:relative;width:100%;height:100%;transition:transform .65s cubic-bezier(.2,.75,.2,1);transform-style:preserve-3d;-webkit-transform-style:preserve-3d;cursor:pointer}
@@ -526,7 +527,8 @@ html.standalone body{overscroll-behavior-y:none}
 .wel h1{font-family:var(--f-display);font-weight:400;font-size:clamp(40px,11vw,54px);line-height:1.05;margin:26px 0 6px;opacity:0;animation:welUp .9s cubic-bezier(.2,.7,.2,1) 2s forwards}
 .wel h1 b{font-weight:400;color:var(--accent)}
 .wel .sub{color:var(--ink2);margin:0 auto;max-width:28em;opacity:0;animation:welUp .9s cubic-bezier(.2,.7,.2,1) 2.2s forwards}
-.wel .edit{opacity:0;animation:welFade .8s ease 2.4s forwards}
+.wel-motiv{font-family:var(--f-lbl);font-style:italic;color:#9C5347;margin:12px auto 0;max-width:26em;font-size:15px;opacity:0;animation:welFade .8s ease 2.35s forwards}
+.wel .edit{opacity:0;animation:welFade .8s ease 2.5s forwards}
 @keyframes welFade{to{opacity:1}}
 @keyframes welUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .resume{display:flex;align-items:center;gap:16px;width:100%;text-align:left;background:var(--ink);color:var(--bg);border-radius:var(--r-lg);padding:16px 18px;margin:28px 0 8px;box-shadow:0 14px 30px rgba(74,52,38,.22);position:relative;overflow:hidden}
@@ -583,16 +585,17 @@ html.standalone body{overscroll-behavior-y:none}
 .sess-in{padding:16px 0 20px}
 .sess .lcard{opacity:0;transform:translateY(14px) scale(.96);transition:opacity .45s ease,transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .3s;transition-delay:0ms}
 .sess.open .lcard{opacity:1;transform:none;transition-delay:calc(var(--i) * 55ms + 120ms)}
-.lcard .ln{display:block;height:2px;width:46%;margin:-6px auto 4px;background:var(--accent);transform:scaleX(0);transition:transform .6s cubic-bezier(.7,0,.2,1)}
-.sess.open .lcard .ln{transform:scaleX(1);transition-delay:calc(var(--i) * 55ms + 420ms)}
-.lcard.notion .ln{background:var(--ink2);opacity:.4}
+.lcard .onl{margin-bottom:2px}
+.lcard .onl::after{transform:scaleX(0);transform-origin:right;transition:transform .6s cubic-bezier(.7,0,.2,1)}
+.sess.open .lcard .onl::after{transform:scaleX(1);transition-delay:calc(var(--i) * 55ms + 420ms)}
+.lcard.notion .onl::after{background:var(--ink2);opacity:.4}
 .lcard .done{animation:donePop 2.4s ease 1s infinite}
 @keyframes donePop{0%,70%,100%{box-shadow:0 0 0 0 rgba(217,43,31,.35)}85%{box-shadow:0 0 0 7px rgba(217,43,31,0)}}
 .lcard{overflow:hidden}
 .lcard .rip{position:absolute;border-radius:50%;background:rgba(74,52,38,.14);transform:scale(0);animation:rip .5s ease-out forwards;pointer-events:none}
 @keyframes rip{to{transform:scale(4);opacity:0}}
 .sess-meta{font-size:13px;color:var(--ink2);margin:14px 0 0}
-@media (prefers-reduced-motion:reduce){.rv,.sess .lcard,.lcard .ln{opacity:1!important;transform:none!important;transition:none!important}.wel-ar,.wel-line,.wel-tr,.wel h1,.wel .sub,.wel .edit{animation:none!important;opacity:1;clip-path:none;transform:none}}
+@media (prefers-reduced-motion:reduce){.rv,.sess .lcard,.lcard .onl::after{opacity:1!important;transform:none!important;transition:none!important}.wel-ar,.wel-line,.wel-tr,.wel h1,.wel .sub,.wel .edit{animation:none!important;opacity:1;clip-path:none;transform:none}}
 .logo-top{display:block;height:64px;width:auto;margin:0 auto 10px;opacity:0;animation:logoIn 1.4s cubic-bezier(.2,.7,.2,1) forwards,logoFloat 6s ease-in-out 1.4s infinite}
 @keyframes logoIn{from{opacity:0;transform:translateY(-8px) scale(.94);filter:blur(4px)}to{opacity:.9;transform:none;filter:none}}
 @keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
@@ -604,8 +607,10 @@ html.standalone body{overscroll-behavior-y:none}
 /* =====================================================================
    ATELIERS + PROFIL (onglet Révisions)
    ===================================================================== */
-.pf,.at{margin:30px 0 8px}
-.pf-h{font-family:var(--f-sans);font-weight:300;text-transform:uppercase;letter-spacing:.08em;font-size:20px;margin:2px 0 0}
+.sec-h{font-family:var(--f-sans);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:20px;margin:2px 0 0;color:#33221A}
+.sec-div{height:2px;background:var(--ink);opacity:.14;border:0;margin:36px 0 30px;border-radius:1px}
+.sec-rule{height:2px;width:56px;background:var(--ink);opacity:.55;border:0;margin:10px 0 20px;border-radius:1px}
+.pf,.at{margin:0 0 8px}
 .pf .rule,.at .rule{margin:10px 0 14px}
 .pf-rows{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
 .pf-row .pf-t{display:flex;justify-content:space-between;gap:10px;font-size:14.5px}
@@ -644,7 +649,7 @@ html.standalone body{overscroll-behavior-y:none}
 
 /* exercices */
 .ex-target{display:flex;justify-content:center;margin:4px 0 12px}
-.ex-target .onl{display:inline-block;position:relative;padding:0 18px}
+.ex-target .onl{padding:0 18px .12em}
 .ex-target .ar{font-size:92px;line-height:1.7}
 .ex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;direction:rtl}
 .ex-grid.g4,.ex-grid.g2{grid-template-columns:1fr 1fr}
@@ -1522,6 +1527,14 @@ const ICON_TAB = {
   lecture: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v13H6.5A2.5 2.5 0 0 0 4 17.5v-13Z"/></svg>',
   tajweed: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.2 5.3L20 9l-4.4 3.8L17 18.5 12 15.6 7 18.5l1.4-5.7L4 9l5.8-.7L12 3z"/></svg>'
 };
+const MOTIV = [
+  'Chaque lettre apprise est une petite victoire.',
+  'Petit à petit, la lecture devient naturelle.',
+  'La régularité compte plus que la durée.',
+  'Un mot aujourd\'hui, une phrase demain.',
+  'Ta patience d\'aujourd\'hui fait ta fluidité de demain.',
+  'Chaque répétition ancre un peu plus la lettre.'
+];
 function renderAccueil() {
   const all = Object.keys(CARDS), done = all.filter(cardDone).length, pct = Math.round(done / all.length * 100);
   const hr = new Date().getHours(), hello = hr >= 18 || hr < 5 ? 'Bonsoir' : 'Bonjour';
@@ -1539,7 +1552,8 @@ function renderAccueil() {
       <span class="wel-line"></span>
       <p class="wel-tr">« Sois le bienvenu, sois la bienvenue »</p>
       <h1>${hello}${ELEVE.prenom ? `, <b>${esc(ELEVE.prenom)}</b>` : ''}</h1>
-      <p class="sub">Content de te retrouver. Un petit peu chaque jour, et les lettres deviennent des mots.</p>
+      <p class="sub">Bienvenue dans ton espace de révision <b>Sanad</b>. Ici, quelques minutes par jour suffisent.</p>
+      <p class="wel-motiv">${esc(pick(MOTIV))}</p>
       <button class="link edit" data-act="rename">modifier mon prénom</button>
     </header>
     ${nc ? `<button class="resume rv" data-act="card" data-slug="${nc.slug}"><span class="gl">${arHTML(nc.glyph)}</span><span><small>Reprendre · séance ${pad(nc.s)}</small><b>${esc(nc.kind === 'notion' ? nc.name : 'La lettre ' + nc.name)}</b></span><span class="go">→</span></button>`
@@ -1563,8 +1577,9 @@ function renderHome() {
   let h = `<header class="rvh"><p class="lbl">Mon cours d'arabe</p><h1>Révisions</h1><hr class="rule">
     <p>Touche une séance pour l'ouvrir, puis une carte pour commencer.</p>
     <div class="wel-prog"><div class="bar"><span id="rvBar" style="width:0"></span></div><p>${done}/${all.length} cartes</p></div></header>
-    ${ateliersHTML()}${profileHTML()}
-    <p class="lbl" style="margin-top:34px">Mes séances</p><h2 class="pf-h">Cartes des séances</h2><div class="path">`;
+    ${profileHTML()}
+    <div class="sec-div rv"></div>
+    <p class="lbl">Mes séances</p><h2 class="sec-h">Cartes des séances</h2><hr class="sec-rule"><div class="path">`;
   for (let s = 1; s <= 8; s++) {
     const cards = sessionCards(s), d = cards.filter(c => cardDone(c.slug)).length, rev = P.revisions[s];
     const off = 113.1 * (1 - d / cards.length), open = OPEN_S.has(s);
@@ -1577,13 +1592,16 @@ function renderHome() {
       <div class="sess-b"><div><div class="sess-in">
         <div class="cards">${cards.map((c, i) => `<button class="lcard${c.kind === 'notion' ? ' notion' : ''}" style="--i:${i}" data-act="card" data-slug="${c.slug}">
           ${cardDone(c.slug) ? '<span class="done" aria-label="déjà travaillée"></span>' : ''}
-          ${arHTML(c.glyph)}<span class="ln"></span><span class="lcard-name">${esc(c.name)}</span><span class="lcard-hint">${esc(c.hint.replace(/^équivalent du /, ''))}</span></button>`).join('')}</div>
+          <span class="onl">${arHTML(c.glyph)}</span><span class="lcard-name">${esc(c.name)}</span><span class="lcard-hint">${esc(c.hint.replace(/^équivalent du /, ''))}</span></button>`).join('')}</div>
         ${rev ? `<p class="sess-meta">Dernière révision : ${rev.last}</p>` : ''}
         <div class="s-actions"><button class="btn soft block" data-act="revision" data-s="${s}">Révision de la séance ${pad(s)}</button></div>
       </div></div></div>
     </section>`;
   }
-  h += `</div><div class="sig"><img src="${LOGO}" alt=""><span>Sanad · par Abdelilah Nadhi</span></div><div class="foot"><button class="link" data-act="admin">Espace professeur</button></div>`;
+  h += `</div>
+    <div class="sec-div rv"></div>
+    ${ateliersHTML()}
+    <div class="sig"><img src="${LOGO}" alt=""><span>Sanad · par Abdelilah Nadhi</span></div><div class="foot"><button class="link" data-act="admin">Espace professeur</button></div>`;
   main().innerHTML = h;
   reveal();
   requestAnimationFrame(() => setTimeout(() => {
@@ -1678,7 +1696,7 @@ function stepFlash(st) {
   return `<p class="step-lbl">${esc(S.label)}</p><h2 class="step-title">${isWord ? 'Carte mot' : 'Carte lettre'}${st.retry ? ' — on revoit' : ''}</h2>
     <div class="flip" id="flip"><div class="flip-in" data-act="flip" role="button" aria-label="Retourner la carte" tabindex="0">
       <div class="face front"><span class="tag">${isWord ? (/\s/.test(String(it.arabe).trim()) ? 'Lis ces mots' : 'Lis ce mot') : 'Lis cette syllabe'}</span>${it.source === 'invente' ? '<span class="tag-r badge inv">lecture syllabique</span>' : ''}
-        <div class="${isWord ? 'word' : 'big'}">${isWord ? arHTML(it.arabe, { hl: hlL }) : `<span class="onl">${arHTML(it.arabe)}</span>`}</div><span class="hint">Touche la carte pour la retourner</span></div>
+        <div class="${isWord ? 'word' : 'big'}"><span class="onl">${isWord ? arHTML(it.arabe, { hl: hlL }) : arHTML(it.arabe)}</span></div><span class="hint">Touche la carte pour la retourner</span></div>
       <div class="face back"><span class="tag">Correspondance en français</span>
         <p class="phon">${esc(it.phonetique || translit(it.arabe))}</p>${it.sens ? `<p class="sens">${esc(it.sens)}</p>` : ''}
         ${it.source === 'invente' ? '<p class="sens">lecture syllabique pour s\'entraîner à lire</p>' : ''}
@@ -3148,7 +3166,7 @@ function profileHTML() {
   const groups = ['proches', 'lettre', 'harakat', 'prolongation', 'forme', 'ecriture', 'lecture'].map(c => [c, weak.filter(e => e.cat === c && e.sub).slice(0, 3)]).filter(([, a]) => a.length);
   const any = Object.keys(st.cat).length;
   return `<section class="pf rv" id="profil">
-    <p class="lbl">Mon profil</p><h2 class="pf-h">Mes points à consolider</h2><hr class="rule">
+    <p class="lbl">Mon profil</p><h2 class="sec-h">Mes points à consolider</h2><hr class="sec-rule">
     ${any ? `<div class="pf-rows">${rows}</div>` : '<p class="muted">Fais un atelier ou une série : tes points forts et tes points à consolider apparaîtront ici.</p>'}
     ${groups.length ? `<div class="pf-weak">${groups.map(([c, a]) => `<p class="lbl">${({ proches: 'Lettres qui se ressemblent', lettre: 'Lettres à bien reconnaître', harakat: 'Harakat à renforcer', prolongation: 'Prolongations à renforcer', forme: 'Formes à revoir', ecriture: 'Lettres à écrire encore', lecture: 'Lecture' })[c]}</p>
       <ul>${a.map(e => `<li><span class="pf-el">${elLabel(e)}</span><span class="pf-n">${e.n} fois à revoir${e.ok ? ` · ${e.ok} réussite${e.ok > 1 ? 's' : ''}` : ''}</span></li>`).join('')}</ul>`).join('')}</div>` : ''}
@@ -3159,7 +3177,7 @@ function ateliersHTML() {
   const L = level();
   const T = [['trouve', 'Trouve la lettre', 'Repère la bonne lettre parmi ses sosies', 'ب'], ['meme', 'Même lettre', 'Toutes ses formes : début, milieu, fin', 'ـبـ'],
     ['syll', 'Lis la syllabe', 'Lettre + haraka, sons courts et longs', 'بَا'], ['ecoute', 'Écoute et choisis', 'Relie le son à l\'écrit', "<svg viewBox=\"0 0 24 24\" width=\"30\" height=\"30\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 9v6h4l5 4V5L8 9H4z\"/><path d=\"M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12\"/></svg>"], ['ecris', 'Écris la lettre', 'Trace-la avec ton doigt', "<svg viewBox=\"0 0 24 24\" width=\"30\" height=\"30\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 20c3-1 5-4 8-4s3 3 6 2\"/><path d=\"M14 4l4 4-7 7H7v-4z\"/></svg>"]];
-  return `<section class="at rv"><p class="lbl">S'entraîner</p><h2 class="pf-h">Ateliers</h2><hr class="rule">
+  return `<section class="at rv"><p class="lbl">S'entraîner</p><h2 class="sec-h">Ateliers</h2><hr class="sec-rule">
     <div class="lvl"><span>Jusqu'à la séance</span><div class="lvl-c">${[1, 2, 3, 4, 5, 6, 7, 8].map(s => `<button class="${s === L ? 'on' : ''}" data-act="level" data-s="${s}">${pad(s)}</button>`).join('')}</div></div>
     <div class="at-grid">${T.map(([k, n, d, g], i) => { const off = !exAvailable(k, L); return `<button class="at-card${off ? ' off' : ''}" style="--i:${i}" data-act="atelier" data-ex="${k}">
       <span class="at-g">${/[\u0600-\u06FF]/.test(g) ? A1(g) : g}</span><span class="at-n">${n}</span><span class="at-d">${off ? 'à partir de la séance 02' : d}</span>${k === 'ecoute' || k === 'ecris' ? '<span class="at-soon">audio bientôt</span>' : ''}</button>`; }).join('')}</div>
